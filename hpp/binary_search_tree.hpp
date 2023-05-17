@@ -1,78 +1,68 @@
-#ifndef binary_search_tree_HPP
-#define binary_search_tree_HPP
-#include <vector>
+#ifndef BINARY_SEARCH_TREE_HPP
+#define BINARY_SEARCH_TREE_HPP
+#include <iostream>
 
-template <class T>
-class tree_node
-{
+template <typename T>
+class BSTNode {
 public:
-    T element;
-    tree_node *left;
-    tree_node *right;
+    T data;
+    BSTNode<T>* left;
+    BSTNode<T>* right;
 
-public:
-    tree_node(T element)
-    {
-        this->element = element;
-        this->left = nullptr;
-        this->right = nullptr;
-    }
-
-    tree_node(T element, tree_node *left, tree_node *right)
-    {
-        this->element = element;
-        this->left = left;
-        this->right = right;
-    }
-
-
+    BSTNode(const T& value)
+        : data(value), left(nullptr), right(nullptr) {}
 };
 
-namespace myDS
-{
-    // 此二叉树为二叉搜索树
-    template <class T>
-    class binary_search_tree
-    {
-    public:
-        binary_search_tree()
-        {
-            __root = nullptr;
+template <typename T>
+class BST {
+private:
+    BSTNode<T>* root;
+
+    void insertNode(BSTNode<T>*& node, const T& value) {
+        if (node == nullptr) {
+            node = new BSTNode<T>(value);
+        } else if (value < node->data) {
+            insertNode(node->left, value);
+        } else {
+            insertNode(node->right, value);
         }
+    }
 
-        binary_search_tree(std::vector<T> array)
-        {
-            for (auto val : array)
-            {
-                insert(__root, val);
-            }
+    bool searchNode(BSTNode<T>* node, const T& value) const {
+        if (node == nullptr) {
+            return false;
+        } else if (value == node->data) {
+            return true;
+        } else if (value < node->data) {
+            return searchNode(node->left, value);
+        } else {
+            return searchNode(node->right, value);
         }
+    }
 
-        ~binary_search_tree() 
-        {
-
+    void inorderTraversal(BSTNode<T>* node) const {
+        if (node != nullptr) {
+            inorderTraversal(node->left);
+            std::cout << node->data << " ";
+            inorderTraversal(node->right);
         }
+    }
 
-        
-        
-        tree_node<T> *insert(tree_node<T> *node, T element)
-        {
-            if (node == nullptr)
-                node = new tree_node<T>(element);
-            if (element <= node->element)
-                insert(node->left, element);
-            else 
-                insert(node->right, element);
-            return node;
-        }
-        
+public:
+    BST() : root(nullptr) {}
 
+    void insert(const T& value) {
+        insertNode(root, value);
+    }
 
+    bool search(const T& value) const {
+        return searchNode(root, value);
+    }
 
-    public:
-        tree_node<T> *__root;
-        
-    };
-}
+    void inorder() const {
+        inorderTraversal(root);
+        std::cout << std::endl;
+    }
+};
 
 #endif
