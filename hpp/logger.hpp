@@ -8,6 +8,8 @@ enum class LogLevel { DEBUG, INFO, WARNING, ERROR };
 
 class Logger {
 public:
+    Logger() {}
+
     Logger(const std::string& filename)
     {
         file.open(filename, std::ios::app);
@@ -19,8 +21,24 @@ public:
             file.close();
     }
 
+    void SetFile(const std::string& filename)
+    {
+        if (!file.is_open())
+        {
+            file.open(filename);
+        }
+        else
+        {
+            file.close();
+            file.open(filename);
+        }
+    }
+
     void Log(LogLevel level, const std::string& message)
     {
+        if (!file.is_open())
+            throw "no file opened";
+
         std::string timestamp = GetTimestamp();
         std::string levelString = GetLogLevelString(level);
         std::string logLine = "[" + timestamp + "] " + "[" + levelString + "] " + message + "\n";
@@ -61,17 +79,5 @@ private:
         }
     }
 };
-
-int main()
-{
-    Logger logger("log.txt");
-
-    logger.Log(LogLevel::INFO, "This is an info message.");
-    logger.Log(LogLevel::DEBUG, "This is a debug message.");
-    logger.Log(LogLevel::WARNING, "This is a warning message.");
-    logger.Log(LogLevel::ERROR, "This is an error message.");
-
-    return 0;
-}
 
 #endif
